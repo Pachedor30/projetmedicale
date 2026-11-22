@@ -30,7 +30,7 @@ COPY docker/postgresql-module.xml \
 
 COPY --from=build /build/target/Projetmedical-1.0-SNAPSHOT-wildfly-jaas.jar \
     /opt/jboss/wildfly/modules/com/mycompany/projetmedical/security/main/projetmedical-wildfly-jaas.jar
-COPY --from=build /build/target/wildfly-jaas/jbcrypt-0.4.jar \
+COPY --from=build /build/target/Projetmedical-1.0-SNAPSHOT/WEB-INF/lib/jbcrypt-0.4.jar \
     /opt/jboss/wildfly/modules/com/mycompany/projetmedical/security/main/jbcrypt-0.4.jar
 COPY wildfly-jaas/module.xml \
     /opt/jboss/wildfly/modules/com/mycompany/projetmedical/security/main/module.xml
