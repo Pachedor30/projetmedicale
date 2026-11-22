@@ -47,7 +47,7 @@ public class MedecinServlet extends HttpServlet {
     }
     @Override protected void doPost(HttpServletRequest req,HttpServletResponse resp)throws ServletException,IOException{
         if(!autorise(req,resp))return;req.setCharacterEncoding("UTF-8");String token=(String)req.getSession().getAttribute(Constantes.SESSION_CSRF);if(token==null||!token.equals(req.getParameter("csrf"))){resp.sendError(403);return;}
-        Utilisateur u=medecin(req);String path=route(req),action=req.getPathInfo();long patient=id(req.getParameter("patientId"));
+        Utilisateur u=medecin(req);String path=route(req),action=action(req);long patient=id(req.getParameter("patientId"));
         try{
             if("patient".equals(path)&&"/demarrer".equals(action)){String rd=req.getParameter("rendezVousId");Long rdv=rd==null||rd.isBlank()?null:id(rd);service.demarrer(u.getId(),patient,rdv,opt(req,"motif",500),req.getRemoteAddr());req.setAttribute("messageSucces","Consultation ouverte et reliée au dossier médical.");}
             else if("patient".equals(path)&&"/enregistrer".equals(action)){service.enregistrer(u.getId(),id(req.getParameter("consultationId")),opt(req,"motif",2000),opt(req,"observations",10000),opt(req,"diagnostic",5000),opt(req,"conduite",5000),req.getRemoteAddr());req.setAttribute("messageSucces","Compte rendu enregistré.");}
@@ -62,6 +62,7 @@ public class MedecinServlet extends HttpServlet {
     private boolean autorise(HttpServletRequest r,HttpServletResponse p)throws IOException{Object x=r.getSession(false)==null?null:r.getSession(false).getAttribute(Constantes.SESSION_UTILISATEUR);if(!(x instanceof Utilisateur)){p.sendError(401);return false;}if(!Constantes.ROLE_MEDECIN.equals(((Utilisateur)x).getRole())){p.sendError(403);return false;}if(r.getSession().getAttribute(Constantes.SESSION_CSRF)==null){byte[] b=new byte[32];RANDOM.nextBytes(b);r.getSession().setAttribute(Constantes.SESSION_CSRF,Base64.getUrlEncoder().withoutPadding().encodeToString(b));}return true;}
     private Utilisateur medecin(HttpServletRequest r){return (Utilisateur)r.getSession().getAttribute(Constantes.SESSION_UTILISATEUR);}
     private String route(HttpServletRequest r){String p=r.getPathInfo();if(p==null||p.equals("/"))return "accueil";String[] a=p.substring(1).split("/");if(a[0].equals("patient")&&a.length>1)return "patient";if(a[0].equals("consultations")||a[0].equals("carnets"))return a[0];return a[0];}
+    private String action(HttpServletRequest r){String p=r.getPathInfo();if(p==null||p.isBlank()||p.equals("/"))return "";String[] a=p.split("/");return a.length==0?"":"/"+a[a.length-1];}
     private long id(String s){try{long n=Long.parseLong(s);if(n<=0)throw new NumberFormatException();return n;}catch(Exception e){throw new IllegalArgumentException("Identifiant invalide.");}}
     private String required(HttpServletRequest r,String k,int n){String s=Echappement.texte(r.getParameter(k));if(s.isEmpty()||s.length()>n)throw new IllegalArgumentException("Champ requis ou trop long : "+k);return s;}
     private String opt(HttpServletRequest r,String k,int n){String s=Echappement.texte(r.getParameter(k));if(s.length()>n)throw new IllegalArgumentException("Champ trop long : "+k);return s.isEmpty()?null:s;}
