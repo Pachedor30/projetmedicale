@@ -38,7 +38,7 @@ Le fichier Maven `pom.xml`, qui déclare les dépendances de l'application WAR, 
 
 À la création du service Web Render, sélectionnez le runtime **Docker** et gardez la racine du dépôt comme répertoire du projet. Le `Dockerfile` à la racine construit le WAR avec Java 21, installe le pilote PostgreSQL et le module de sécurité JAAS dans WildFly 41, puis déploie l'application.
 
-Ajoutez au service Web les variables `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` et `DB_PASS` avec les valeurs de la base PostgreSQL Render. Utilisez l'hôte interne de la base et placez les deux services dans la même région. Render définit `PORT` pour le serveur Web ; WildFly s'y lie sur `0.0.0.0`. L'application garde le chemin `/clinique`, donc son adresse Render se termine par `/clinique`.
+Ajoutez au service Web les variables `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` et `DB_PASS` avec les valeurs de la base PostgreSQL Render. Utilisez l'hôte interne de la base et placez les deux services dans la même région. Render définit `PORT` pour le serveur Web ; WildFly s'y lie sur `0.0.0.0`. L'application est publiée à la racine du domaine Render.
 
 Le fichier `docker/standalone.xml` est la configuration WildFly dédiée au conteneur. Il référence ces variables à l'exécution ; le script CLI destiné au serveur WildFly local n'est pas nécessaire pour le déploiement Docker.
 
