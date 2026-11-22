@@ -54,7 +54,7 @@ public class AccueilServlet extends HttpServlet {
         if(!autorise(req,resp))return; req.setCharacterEncoding("UTF-8");
         String token=(String)req.getSession().getAttribute(Constantes.SESSION_CSRF);
         if(token==null||!token.equals(req.getParameter("csrf"))){resp.sendError(403);return;}
-        Utilisateur u=(Utilisateur)req.getSession().getAttribute(Constantes.SESSION_UTILISATEUR); String path=route(req); String action=req.getPathInfo();
+        Utilisateur u=(Utilisateur)req.getSession().getAttribute(Constantes.SESSION_UTILISATEUR); String path=route(req); String action=action(req);
         try {
             if("patients".equals(path)&&"/creer".equals(action)){
                 if(!"on".equals(req.getParameter("identite_verifiee")))throw new IllegalArgumentException("Confirmez la vérification de l’identité du patient.");
@@ -94,6 +94,7 @@ public class AccueilServlet extends HttpServlet {
         return true;
     }
     private String route(HttpServletRequest r){String p=r.getPathInfo();if(p==null||p.equals("/"))return "dashboard";String[] a=p.substring(1).split("/");if(a[0].equals("accueil"))return "dashboard";return a.length>1&&a[0].equals("rendezvous")?"rendezvous":a[0];}
+    private String action(HttpServletRequest r){String p=r.getPathInfo();if(p==null||p.isBlank()||p.equals("/"))return "";String[] a=p.split("/");return a.length==0?"":"/"+a[a.length-1];}
     private String required(HttpServletRequest r,String key,int max){String s=Echappement.texte(r.getParameter(key));if(s.isEmpty()||s.length()>max)throw new IllegalArgumentException("Champ invalide : "+key+".");return s;}
     private String opt(HttpServletRequest r,String key,int max){String s=Echappement.texte(r.getParameter(key));if(s.length()>max)throw new IllegalArgumentException("Valeur trop longue : "+key+".");return s.isEmpty()?null:s;}
     private LocalDate optionalDate(HttpServletRequest r,String key){String s=r.getParameter(key);return s==null||s.isBlank()?null:LocalDate.parse(s);}
