@@ -555,9 +555,4 @@
       <remote-destination host="${jboss.mail.server.host:localhost}" port="${jboss.mail.server.port:25}" />
     </outbound-socket-binding>
   </socket-binding-group>
-  <deployments>
-    <deployment name="Projetmedical-1.0-SNAPSHOT.war" runtime-name="Projetmedical-1.0-SNAPSHOT.war">
-      <content sha1="7817f7850b0b267229d733dfb7d4f1e078d4f862" />
-    </deployment>
-  </deployments>
 </server>
