@@ -1,0 +1,1 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %><%@ page import="com.mycompany.projetmedical.util.Echappement" %><div class="panel"><div class="alert-error"><%=Echappement.html((String)request.getAttribute("erreur"))%></div><p>Retournez à vos patients ou réessayez plus tard.</p></div>

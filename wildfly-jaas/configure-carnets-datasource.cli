@@ -1,0 +1,6 @@
+# À exécuter sur le serveur WildFly après avoir défini DB_HOST, DB_PORT,
+# DB_NAME, DB_USER et DB_PASS dans l'environnement du processus WildFly.
+/subsystem=datasources/data-source=CarnetsDS:write-attribute(name=connection-url,value="jdbc:postgresql://${env.DB_HOST}:${env.DB_PORT}/${env.DB_NAME}")
+/subsystem=datasources/data-source=CarnetsDS:write-attribute(name=user-name,value="${env.DB_USER}")
+/subsystem=datasources/data-source=CarnetsDS:write-attribute(name=password,value="${env.DB_PASS}")
+:reload

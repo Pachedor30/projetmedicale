@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+   version="6.0">
+
+    <display-name>Clinique Miracle - Gestion des carnets medicaux</display-name>
+
+    <!-- ============================================================
+         PAGE D'ACCUEIL : portail de connexion (unique, tous roles)
+         ============================================================ -->
+    <welcome-file-list>
+        <welcome-file>accueil.jsp</welcome-file>
+    </welcome-file-list>
+
+    <!-- ============================================================
+         SESSION
+         ============================================================ -->
+    <session-config>
+        <session-timeout>30</session-timeout>
+        <cookie-config>
+            <http-only>true</http-only>
+            <secure>false</secure>
+        </cookie-config>
+        <tracking-mode>COOKIE</tracking-mode>
+    </session-config>
+
+    <!-- ============================================================
+         ROLES DU SYSTEME (§4 du cahier des charges)
+         ============================================================ -->
+    <security-role><role-name>ADMIN</role-name></security-role>
+    <security-role><role-name>ACCUEIL</role-name></security-role>
+    <security-role><role-name>MEDECIN</role-name></security-role>
+    <security-role><role-name>LABORANTIN</role-name></security-role>
+    <security-role><role-name>CAISSIER_COMPTABLE</role-name></security-role>
+    <security-role><role-name>PATIENT</role-name></security-role>
+
+    <!-- ============================================================
+         AUTHENTIFICATION : realm JAAS Elytron (PostgreSQL / BCrypt)
+         La page de connexion reste personnalisee : l'authentification
+         est faite par request.login() dans ConnexionServlet.
+         ============================================================ -->
+    <login-config>
+        <auth-method>FORM</auth-method>
+        <realm-name>CliniqueSecurity</realm-name>
+        <form-login-config>
+            <form-login-page>/connexion.jsp</form-login-page>
+            <form-error-page>/connexion.jsp?erreur=acces</form-error-page>
+        </form-login-config>
+    </login-config>
+
+    <!-- ============================================================
+         CONTRAINTES D'ACCES (controle serveur, anti contournement URL)
+         Les ressources du portail public (connexion, inscription,
+         CSS/JS/images) sont volontairement absentees de cette liste.
+         ============================================================ -->
+
+    <!-- Espace administrateur -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Espace administrateur</web-resource-name>
+            <url-pattern>/dashboard.jsp</url-pattern>
+            <url-pattern>/admin/*</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>ADMIN</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <!-- Espace agent d'accueil -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Espace accueil</web-resource-name>
+            <url-pattern>/espace-accueil.jsp</url-pattern>
+            <url-pattern>/accueil/*</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>ADMIN</role-name>
+            <role-name>ACCUEIL</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <!-- Espace medecin -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Espace medecin</web-resource-name>
+            <url-pattern>/espace-medecin.jsp</url-pattern>
+            <url-pattern>/medecin/*</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>MEDECIN</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <!-- Espace laborantin -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Espace laboratoire</web-resource-name>
+            <url-pattern>/espace-labo.jsp</url-pattern>
+            <url-pattern>/labo/*</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>LABORANTIN</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <!-- Espace caisse -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Espace caisse</web-resource-name>
+            <url-pattern>/espace-caisse.jsp</url-pattern>
+            <url-pattern>/caisse/*</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>CAISSIER_COMPTABLE</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <!-- Espace patient (son propre dossier uniquement) -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Espace patient</web-resource-name>
+            <url-pattern>/espace-patient.jsp</url-pattern>
+            <url-pattern>/patient/*</url-pattern>
+            <url-pattern>/mes-*</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>PATIENT</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <!-- Zone commune authentifiee : toute page / rubrique interieure
+         exige un utilisateur identifie (quel que soit son role) -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Zone connectee</web-resource-name>
+            <url-pattern>/fragments/*</url-pattern>
+            <url-pattern>/deconnexion</url-pattern>
+            <url-pattern>/changements-mdp.jsp</url-pattern>
+            <url-pattern>/profil/*</url-pattern>
+            <http-method>GET</http-method>
+            <http-method>POST</http-method>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>ADMIN</role-name>
+            <role-name>ACCUEIL</role-name>
+            <role-name>MEDECIN</role-name>
+            <role-name>LABORANTIN</role-name>
+            <role-name>CAISSIER_COMPTABLE</role-name>
+            <role-name>PATIENT</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+</web-app>

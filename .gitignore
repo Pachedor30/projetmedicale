@@ -1,0 +1,15 @@
+# Maven
+target/
+
+# Local secrets and environment files
+.env
+.env.*
+!.env.example
+
+# NetBeans local metadata
+nbproject/private/
+
+# Logs and operating-system files
+*.log
+Thumbs.db
+.DS_Store
